@@ -1,14 +1,22 @@
 import React, { useState,useEffect } from 'react';
 import {  Box, TextField, Button,  } from '@mui/material';
+import { useStateWithCallbackLazy } from 'use-state-with-callback';
 import axios from 'axios';
+
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  // useEffect(() => {
-  //   const intialMsg = `I am Diaspark Support ChatBot. I would be more than happy to help you `
-  //   setMessages((prevMessages) => [...prevMessages,{ text: intialMsg, type: 'bot' },]);
-  // }, []);
+  const [input, setInput] = useStateWithCallbackLazy('');
+  useEffect(() => {
+    const intialMsg = `I am Diaspark Support ChatBot. I would be more than happy to help you `
+    setMessages((prevMessages) => [...prevMessages,{ text: intialMsg, type: 'bot',subtype: 'text' },])
+
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Here are some things i can help you with', type: 'bot',subtype: 'text' },])
+
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Support Enquiry', type: 'bot',subtype:'option' },])
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Track Support Enquiry', type: 'bot',subtype:'option' },])
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Product Demo', type: 'bot',subtype:'option' },])
+  }, []);
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
@@ -37,9 +45,10 @@ const Chatbot = () => {
    }
   const handleSubmit = () => {
     //setMessages([...messages, { text: input, type: 'user' }]);
-    setMessages((prevMessages) => [...prevMessages,{ text: input, type: 'user' },]);
-    
     console.log(input)
+    setMessages((prevMessages) => [...prevMessages,{ text: input, type: 'user',subtype: 'text' },]);
+    
+
 
     if (input === 'api')
     {
@@ -51,14 +60,22 @@ const Chatbot = () => {
       setTimeout(() => {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: bot_response, type: 'bot' },
+          { text: bot_response, type: 'bot' ,subtype: 'text'},
         ]);
-      }, 500,setInput(''));
+      }, 500,()=>{setInput('')});
       
   }
    
   
   };
+  const handleOptionButtonClick = (event)=>{
+    const value = event.target.innerText
+    console.log(value)
+    setInput(value,() => {
+      handleSubmit();
+   })
+    //handleSubmit
+  }
 
   const handleKeyDown =(event)=>
   {
@@ -67,6 +84,35 @@ const Chatbot = () => {
       handleSubmit()
     }
   }
+  const listMessages= messages.map((message,index)=>{
+            return(
+            <div
+              key={index}
+              style={{
+              marginBottom: '8px',
+              display: 'flex',
+              justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
+            }}
+            >
+            <div
+              style={{
+                padding: '8px',
+                borderRadius: '8px',
+                backgroundColor: message.type === 'user' ? '#1d5242' : '#b77c3c',
+                color: message.type === 'user' ? 'white' : 'white',
+                maxWidth: '70%',
+              }}
+            >
+              {message.subtype === 'text' ?
+
+              message.text
+              :
+              <button style={{backgroundColor:'#1d5242',color:'white',borderRadius:'10px',cursor:'pointer'}} onClick={handleOptionButtonClick}> {message.text} </button>
+  }
+            </div>
+          </div>
+            )
+        })
   return (
     <div
       style={{
@@ -96,56 +142,9 @@ const Chatbot = () => {
         >
         <img src="https://www.luxare.com/static/media/logo.73b907d42e58413b55af893af16718e2.svg" alt="LogoImg" title="Logo" />
         </div>
-        <div
-              style={{
-                padding: '8px',
-                marginBottom: '8px',
-                borderRadius: '8px',
-                backgroundColor:   '#b77c3c',
-                color:  'white',
-                maxWidth: '40%',
-              }}
-            >
-          I am Diaspark Support ChatBot. I would be more than happy to help you
-          </div>
-          {/* <div
-              style={{
-                padding: '8px',
-                marginBottom: '8px',
-                borderRadius: '8px',
-                backgroundColor:   '#b77c3c',
-                color:  'white',
-                maxWidth: '40%',
-              }}
-            >
-            <ul style={{listStyleType: 'none',margin:'10px'}}>
-          <li><Button style={{color:'white',background:'#1d5242'}}>Request </Button></li>
-          <li><Button style={{color:'white',background:'#1d5242'}} >Send </Button></li>
-          </ul>
-          </div> */}
+    
+       {listMessages}
        
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            style={{
-              marginBottom: '8px',
-              display: 'flex',
-              justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
-            }}
-          >
-            <div
-              style={{
-                padding: '8px',
-                borderRadius: '8px',
-                backgroundColor: message.type === 'user' ? '#1d5242' : '#b77c3c',
-                color: message.type === 'user' ? 'white' : 'white',
-                maxWidth: '70%',
-              }}
-            >
-              {message.text}
-            </div>
-          </div>
-        ))}
       </div>
       <Box
         style={{
