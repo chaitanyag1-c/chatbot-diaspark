@@ -5,7 +5,7 @@ import { Form, Input, Modal, Button ,Alert,Space} from "antd";
 import axios from "axios"
 import { showAlert } from "./Alert";
 
-const ModalChatbot = ({ visible, onCancel, onConfirm }) => {
+const ModalChatbot = ({ visible, onCancel, onConfirm,sendDataToParent }) => {
     const [form] = Form.useForm()
 
     const handleOk = () => {
@@ -29,7 +29,7 @@ const onFinish = async (value) => {
 
       if (response.ok) {
         const data = await response.json();
-  
+        sendDataToParent(data)
         if (data.result === 'success') {
           showAlert.success('Login successful');
   

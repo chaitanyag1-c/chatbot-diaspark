@@ -23,7 +23,7 @@ const Chatbot = () => {
   const [orderqc, setorderqc] = useState(false);
   const [orderack, setorderack] = useState(false);
   const [orderacc, setorderacc] = useState(false);
-  
+  const [receivedLoginData, setReceivedLoginData] = useState(null);
 
 
   
@@ -57,7 +57,15 @@ const Chatbot = () => {
     setOptions([])
  },[options]);
 
-
+ const handleDataFromChild = (data) => {
+  console.log('Data:', data);
+if(data.result == 'success')
+  {
+    setReceivedLoginData(data);
+        setMessages((prevMessages) => [...prevMessages,{ text: `Hi ${data.data.user.first_name}, Please enter your Order #`, type: 'bot' ,subtype: 'text'},]);
+        setCurrentFeature('Cancel Order')
+  }
+};
  const drawOptions = () =>{
   options.map((option)=>{
     setMessages((prevMessages) => [...prevMessages,{ text: option.option_value, type: 'bot',subtype:'option', },])
@@ -149,14 +157,16 @@ const handleDemoConfirmModal = () => {
           else if (input === 'Product Demo')
           {
             setModalDemoVisible(true);
-
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Please select the feature you want to understand', type: 'bot' ,subtype: 'text'},]);
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Criteria Working', type: 'bot' ,subtype: 'option'},]);
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Order Creation', type: 'bot' ,subtype: 'option'},]);
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Report', type: 'bot' ,subtype: 'option'},]);
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Generate auto order', type: 'bot' ,subtype: 'option'},]);
           }
           else if(input === 'Cancel Order')
           {
             //add modal code here
             setModalVisible(true);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Hi, Please enter your Order#', type: 'bot' ,subtype: 'text'},]);
-            setCurrentFeature('Cancel Order')
           }
           else if(input === 'Order Tracking')
           {
@@ -385,7 +395,9 @@ const handleDemoConfirmModal = () => {
         <Button variant="contained" color="primary" onClick={handleSubmit} style={{background: '#1d5242'}}>
           Send
         </Button>
-        <ModalChatbot visible={modalVisible} onCancel={handleCancelModal} onConfirm={handleConfirmModal} />
+        <ModalChatbot visible={modalVisible} onCancel={handleCancelModal} onConfirm={handleConfirmModal} 
+        sendDataToParent={handleDataFromChild}
+        />
         
         <ModalOrderTrack visible={modalOrderTrackVisible} onCancel={handleTrackCancelModal} onConfirm={handleTrackConfirmModal} 
         orderPickFlag = {orderpick}
