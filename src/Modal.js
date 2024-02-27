@@ -12,6 +12,7 @@ const ModalChatbot = ({ visible, onCancel, onConfirm,sendDataToParent }) => {
    
     form.submit()
     onCancel()
+    //form.resetFields()
   };
 
   const handleCancel = () => {
@@ -20,7 +21,7 @@ const ModalChatbot = ({ visible, onCancel, onConfirm,sendDataToParent }) => {
 
 const onFinish = async (value) => {
     //e.preventDefault();
-      const response = await fetch(`http://diaspark.supportchatbot:5002/login?login=${value.username}&password=${value.pwd}`, {
+      const response = await fetch(`http://chatbot.diaspark:5000/login?login=${value.username}&password=${value.pwd}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ const onFinish = async (value) => {
         }
       }
     
-    
+      form.resetFields()
   };
 
   return (
@@ -58,7 +59,7 @@ const onFinish = async (value) => {
           </Button>
         ]}
     >
-          <Form
+         <Form
                     form={form}
                     name="basic"
                     initialValues={{ remember: true }}
@@ -83,7 +84,7 @@ const onFinish = async (value) => {
                         
                       
                     >
-                        <Input id="pwd"/>
+                        <Input.Password id="pwd"/>
                        
                     </Form.Item>
 

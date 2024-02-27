@@ -6,7 +6,9 @@ import { Button, Modal, Form, Input, Radio } from "antd";
 import  ModalChatbot  from "./Modal";
 import  ModalOrderTrack  from "./ModalOrderTrack";
 import ModalDemo from './ModalDemo'
-
+import {  SendOutlined } from "@ant-design/icons";
+import Hackie from './Hakie.png'
+import User from './User.png'
 
 
 const Chatbot = () => {
@@ -66,6 +68,17 @@ if(data.result == 'success')
         setCurrentFeature('Cancel Order')
   }
 };
+const handleDatafromDemoChild = (data)=>{
+  if(data.result == 'success')
+  {
+    setReceivedLoginData(data);
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Please select the feature you want to understand', type: 'bot' ,subtype: 'text'},]);
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Criteria Working', type: 'bot' ,subtype: 'option'},]);
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Order Creation', type: 'bot' ,subtype: 'option'},]);
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Report', type: 'bot' ,subtype: 'option'},]);
+    setMessages((prevMessages) => [...prevMessages,{ text: 'Generate auto order', type: 'bot' ,subtype: 'option'},]);
+  }
+}
  const drawOptions = () =>{
   options.map((option)=>{
     setMessages((prevMessages) => [...prevMessages,{ text: option.option_value, type: 'bot',subtype:'option', },])
@@ -109,18 +122,17 @@ const handleDemoConfirmModal = () => {
     }) 
   }
   const getStaticBotResponse = (input) =>{
-    if (input.includes('Hi') || input.includes('Hello'))
+    if (input.includes('hi') || input.includes('hello') || input.includes('Hello') || input.includes('Hi') || input.includes('HI'))
     {
-      return 'Howdy How may i Help you?'
+      return 'Namaste, How may I Help you?'
     }
-    else if (input.includes('How are you') )
+    else if (input.includes('how are you') )
     {
       return 'I feel good helping you.'
     }
-    else if (input.includes('Support Enquiry') )
+    else if (input.includes('bye') )
     {
-      
-      
+      return 'Have a great day :)'
     }
     else
     {
@@ -157,11 +169,6 @@ const handleDemoConfirmModal = () => {
           else if (input === 'Product Demo')
           {
             setModalDemoVisible(true);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Please select the feature you want to understand', type: 'bot' ,subtype: 'text'},]);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Criteria Working', type: 'bot' ,subtype: 'option'},]);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Order Creation', type: 'bot' ,subtype: 'option'},]);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Report', type: 'bot' ,subtype: 'option'},]);
-            setMessages((prevMessages) => [...prevMessages,{ text: 'Generate auto order', type: 'bot' ,subtype: 'option'},]);
           }
           else if(input === 'Cancel Order')
           {
@@ -170,17 +177,36 @@ const handleDemoConfirmModal = () => {
           }
           else if(input === 'Order Tracking')
           {
-            setModalVisible(true);
+            //setModalVisible(true);
             setMessages((prevMessages) => [...prevMessages,{ text: 'Hi, Please enter your Order#', type: 'bot' ,subtype: 'text'},]);
             setCurrentFeature('Order Tracking')
-            
-
           }
           else if(input === 'Track Support Enquiry')
           {
             setMessages((prevMessages) => [...prevMessages,{ text: 'Hi, Please enter your Ticket Number#', type: 'bot' ,subtype: 'text'},]);
             setCurrentFeature('Track Support Enquiry')
+            
           }   
+          else if(input === 'Criteria Working')
+          {
+            window.open('http://diaspark.supportchatbot:5002/demo_videos/criteria_working.mp4', "_blank");
+            
+          }   
+          else if(input === 'Order Creation')
+          {
+            window.open('http://diaspark.supportchatbot:5002/demo_videos/sales_order_creation.mp4', "_blank"); 
+          }   
+          else if(input === 'Report')
+          {
+            
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Work In progress', type: 'bot' ,subtype: 'text'},]);
+          }
+          else if(input === 'Generate auto order')
+          {
+            
+            setMessages((prevMessages) => [...prevMessages,{ text: 'Work In progress', type: 'bot' ,subtype: 'text'},]);
+          }      
+                       
           else{
             const bot_response = getStaticBotResponse(input)
             setTimeout(() => {
@@ -223,18 +249,17 @@ const handleDemoConfirmModal = () => {
   }
   const sendOrderCancelEnquiry = () =>{
     const trans_no = input
-    axios.get(`http://chatbot.diaspark:5000/order_track?trans_no=${trans_no}`)
+    axios.get(`http://chatbot.diaspark:5000/cancel_order?trans_no=${trans_no}`)
     .then(res => {
       const data =  res.data;
       if(data.result == 'error') 
       {
-        setMessages((prevMessages) => [...prevMessages,{ text: data.message+' Please check your order number again', type: 'bot' ,subtype: 'text',errormsg:true},]);
+        setMessages((prevMessages) => [...prevMessages,{ text:'ERROR'+ data.message+' Please check your order number again', type: 'bot' ,subtype: 'text',errormsg:true},]);
       }
       else
       {
+        setMessages((prevMessages) => [...prevMessages,{ text: `Ticket# ${data.data.enquiry.trans_no} is generated, Order cancelled successfully. `, type: 'bot' ,subtype: 'text',errormsg:true},]);
         
-          //handle code here
-        setModalOrderTrackVisible(true);
         setCurrentFeature('')
         
       }
@@ -303,40 +328,86 @@ const handleDemoConfirmModal = () => {
   const handleKeyDown =(event)=>
   {
     if(event.key === 'Enter'){
-      console.log('enter press here! ')
+  
       handleSubmit()
     }
   }
-  const listMessages= messages.map((message,index)=>{
-            return(
-            <div
-              key={index}
-              style={{
-              marginBottom: '8px',
+  const listMessages = messages.map((message, index) => {
+    return (
+      <div
+        key={index}
+        style={{
+          marginBottom: '8px',
+          display: 'flex',
+          justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
+          alignItems: 'flex-start'
+        }}
+      >
+        {message.type !== 'user' && message.subtype === 'text'  && (
+          <div
+            style={{
               display: 'flex',
-              justifyContent: message.type === 'user' ? 'flex-end' : 'flex-start',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#1e90ff', // Non-user image background color
+              color: 'white',
+              marginRight: '8px', // Margin between image and text
             }}
-            >
-            <div
-              style={{
-                padding: '8px',
-                borderRadius: '8px',
-                backgroundColor: message.type === 'user'  ? '#1d5242' : '#b77c3c',
-                color: message.type === 'user' ? 'white' : 'white',
-                maxWidth: '70%',
-              }}
-            >
-              { 
-             message.subtype === 'text'?  
-             message.text 
-             :
-            
-            <Button style={{backgroundColor:'#1d5242',color:'white',borderRadius:'20px',cursor:'pointer'}} onClick={()=>handleOptionButtonClick(message.text)}> {message.text} </Button> 
-  }
-            </div>
+          >
+            <img
+              src={Hackie} //bot
+              alt="Profile"
+              style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '50%' }}
+            />
           </div>
-            )
-        })
+        )}
+        <div
+          style={{
+            padding: message.subtype === "text" ? "8px" : "0px",
+            borderRadius: '8px',
+            backgroundColor: message.type === 'user' ? '#1d5242' : message.subtype === "text" ? "#b77c3c": "#e5e7eb",
+            color: message.type === 'user' ? 'white' : 'white',
+            maxWidth: '70%',
+            marginLeft: message.type !== 'user' ? '0' : '8px', // Margin between text and user image
+            marginRight: message.type === 'user' ? '0' : '8px', // Margin between text and non-user image
+          }}
+        >
+          {message.subtype === 'text' ? message.text : (
+            <Button
+              style={{ backgroundColor: "rgb(45, 29, 6)", color: 'white', borderRadius: '20px', cursor: 'pointer', marginLeft: '50px' }}
+              onClick={() => handleOptionButtonClick(message.text)}
+            >
+              {message.text}
+            </Button>
+          )}
+        </div>
+        {message.type === 'user' && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#1d5242', // User image background color
+              color: 'white',
+              marginLeft: '8px', // Margin between text and user image
+            }}
+          >
+            <img
+              src={User}
+              alt="Profile"
+              style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '50%' }}
+            />
+          </div>
+        )}
+      </div>
+    );
+  });
   return (
     <div
       style={{
@@ -366,8 +437,9 @@ const handleDemoConfirmModal = () => {
           justifyContent:  'center',
         }}
         >
-        <img src="https://www.luxare.com/static/media/logo.73b907d42e58413b55af893af16718e2.svg" alt="LogoImg" title="Logo" />
+        <img src="https://www.luxare.com/static/media/logo.73b907d42e58413b55af893af16718e2.svg" alt="LogoImg" title="Logo" onClick={()=>{window.location.reload();}} />
         </div>
+      <br></br>
       
     
        {listMessages}
@@ -392,8 +464,10 @@ const handleDemoConfirmModal = () => {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
-        <Button variant="contained" color="primary" onClick={handleSubmit} style={{background: '#1d5242'}}>
-          Send
+        <Button variant="contained"  color="#FFFFFF" onClick={handleSubmit}
+        icon={<SendOutlined style={{color:'white'}}/>} disabled={!input}
+        style={{background: '#1d5242',height:'55px',width:'55px'}}>
+         
         </Button>
         <ModalChatbot visible={modalVisible} onCancel={handleCancelModal} onConfirm={handleConfirmModal} 
         sendDataToParent={handleDataFromChild}
@@ -407,7 +481,8 @@ const handleDemoConfirmModal = () => {
         orderAccAppFlag ={orderacc}
         />
         <ModalDemo
-        visible={modalDemoVisible} onCancel={handleDemoCancelModal} onConfirm={handleDemoConfirmModal} 
+        visible={modalDemoVisible} onCancel={handleDemoCancelModal} onConfirm={handleDemoConfirmModal}
+        sendDataToParent={handleDatafromDemoChild} 
         />
       </Box>
     </div>

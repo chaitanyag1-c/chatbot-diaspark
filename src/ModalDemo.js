@@ -3,12 +3,12 @@ import { Form, Input, Modal, Button ,Alert,Space} from "antd";
 import axios from "axios"
 import { showAlert } from "./Alert";
 
-const ModalDemo = ({ visible, onCancel, onConfirm }) => {
+const ModalDemo = ({ visible, onCancel, onConfirm,sendDataToParent }) => {
     const [form] = Form.useForm()
 
     const handleOk = () => {
    
-    
+    form.submit()
     onCancel()
   };
 
@@ -18,7 +18,7 @@ const ModalDemo = ({ visible, onCancel, onConfirm }) => {
 
 const onFinish = async (value) => {
     //e.preventDefault();
-      const response = await fetch(`http://diaspark.supportchatbot:5002/login?login=${value.username}&password=${value.pwd}`, {
+      const response = await fetch(`http://diaspark.supportchatbot:5002/chatbot_option/chatbot_option/add_prospect_enquiry?name=${value.name}&company_name=${value.cname}&phone_no=${value.p_no}&email=${value.email}&message=${value.message}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -27,9 +27,9 @@ const onFinish = async (value) => {
 
       if (response.ok) {
         const data = await response.json();
-  
+        sendDataToParent(data)
         if (data.result === 'success') {
-          showAlert.success('Login successful');
+          showAlert.success(data.message);
   
         } else {
           showAlert.error(data.message)

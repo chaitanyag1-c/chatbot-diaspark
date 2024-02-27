@@ -51,7 +51,6 @@ const Chatbot = () => {
     axios.get(`http://diaspark.supportchatbot:5002/sales/sales/test`)
     .then(res => {
       const persons = res.data;
-      console.log(persons)
       setMessages((prevMessages) => [...prevMessages,{ text: persons[0].name, type: 'bot' },]);
     }) 
   }
